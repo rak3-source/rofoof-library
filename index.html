@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rofoof | Al-Arabiya Private School Digital Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- مكتبة PDF.js لقراءة ملفات الـ PDF ورسمها بدقة عالية -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- مكتبة StPageFlip لتقليب الصفحات ككتاب حقيقي -->
     <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 </head>
 <body>
@@ -23,7 +21,7 @@
                 </div>
             </div>
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search by book title or author...">
+                <input type="text" id="searchInput" placeholder="Search books by title or author...">
             </div>
         </div>
     </header>
@@ -31,6 +29,7 @@
     <nav class="categories-bar">
         <div class="container categories-list" id="categoriesList">
             <button class="cat-btn active" data-category="all">All Books</button>
+            <button class="cat-btn" data-category="Science Fiction">Science Fiction</button>
             <button class="cat-btn" data-category="Short Stories">Short Stories</button>
             <button class="cat-btn" data-category="Novels">Novels</button>
             <button class="cat-btn" data-category="Science">Science</button>
@@ -38,15 +37,22 @@
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container main-section">
+        <div class="section-header">
+            <h2>Featured Library Collection</h2>
+            <span class="book-count" id="bookCount">1 Book Available</span>
+        </div>
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- نافذة قارئ الكتاب الحقيقي (صفحتين متقابلتين) -->
+    <!-- نافذة قارئ الكتاب الحقيقي (صفحتين متقابلتين على الآيباد) -->
     <div class="reader-modal" id="readerModal">
         <div class="reader-container">
             <div class="reader-header">
-                <h3 id="modalBookTitle">Book Title</h3>
+                <div class="reader-title-group">
+                    <span class="badge-live">Interactive Flipbook</span>
+                    <h3 id="modalBookTitle">Book Title</h3>
+                </div>
                 <div class="reader-controls">
                     <button class="nav-page-btn" id="prevPageBtn">◀ Previous</button>
                     <span id="pageIndicator">Loading...</span>
