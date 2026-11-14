@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rofoof | Al-Arabiya Private School Digital Library</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -14,7 +14,9 @@
     <header class="official-header">
         <div class="container header-content">
             <div class="school-brand">
-                <img src="logo.png" alt="Al-Arabiya Private School Logo" class="school-logo">
+                <div class="logo-royal-frame">
+                    <img src="logo.png" alt="Al-Arabiya Private School Logo" class="school-logo">
+                </div>
                 <div>
                     <h1>Rofoof Digital Library</h1>
                     <p>Al-Arabiya Private School — Official Reading Portal</p>
@@ -45,24 +47,65 @@
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- نافذة قارئ الكتاب الحقيقي (صفحتين متقابلتين على الآيباد) -->
+    <!-- نافذة القارئ الاحترافي المتكامل -->
     <div class="reader-modal" id="readerModal">
-        <div class="reader-container">
+        <div class="reader-container" id="readerContainer">
+            <!-- شريط أدوات القراءة العلوي -->
             <div class="reader-header">
                 <div class="reader-title-group">
-                    <span class="badge-live">Interactive Flipbook</span>
+                    <span class="badge-live">📖 Rofoof Reader</span>
                     <h3 id="modalBookTitle">Book Title</h3>
                 </div>
-                <div class="reader-controls">
-                    <button class="nav-page-btn" id="prevPageBtn">◀ Previous</button>
-                    <span id="pageIndicator">Loading...</span>
-                    <button class="nav-page-btn" id="nextPageBtn">Next ▶</button>
-                    <button class="close-btn" id="closeModalBtn">Close ✕</button>
+
+                <!-- أدوات القراءة الذكية -->
+                <div class="reader-toolbar">
+                    <button class="tool-btn" id="bookmarkBtn" title="Save Reading Position">
+                        🔖 <span id="bookmarkText">Save Bookmark</span>
+                    </button>
+                    <button class="tool-btn" id="goBookmarkBtn" style="display: none;" title="Jump to Saved Page">
+                        📌 Go to Saved (<span id="savedPageNum">1</span>)
+                    </button>
+                    <button class="tool-btn" id="sepiaBtn" title="Eye-Comfort Paper Mode">
+                        🌙 Warm Paper
+                    </button>
+                    <button class="tool-btn" id="zoomOutBtn" title="Zoom Out">➖</button>
+                    <button class="tool-btn" id="zoomInBtn" title="Zoom In">➕</button>
+                    <button class="tool-btn" id="fullscreenBtn" title="Full Screen Mode">
+                        ⛶ Full Screen
+                    </button>
+                    <button class="close-btn" id="closeModalBtn">✕</button>
                 </div>
             </div>
-            <div class="reader-body flipbook-stage">
+
+            <!-- شريط التقدم الذهبي -->
+            <div class="reading-progress-track">
+                <div class="reading-progress-fill" id="readingProgressFill"></div>
+            </div>
+
+            <!-- منصة الكتاب مع الكعب الذهبي الفاصل -->
+            <div class="reader-body flipbook-stage" id="flipbookStage">
                 <div id="loadingSpinner" class="loading-text">Opening Book Pages...</div>
-                <div id="flipbookContainer"></div>
+                
+                <!-- الشريط الذهبي المرجعي (Bookmark Ribbon) -->
+                <div class="gold-bookmark-ribbon" id="goldBookmarkRibbon" style="display: none;">
+                    <span>🔖 Saved</span>
+                </div>
+
+                <div class="book-wrapper" id="bookWrapper">
+                    <div id="flipbookContainer"></div>
+                    <!-- الفاصل الذهبي الملكي بين الصفحتين -->
+                    <div class="golden-book-spine" id="goldenSpine"></div>
+                </div>
+            </div>
+
+            <!-- شريط التنقل السفلي -->
+            <div class="reader-footer-bar">
+                <button class="nav-page-btn" id="prevPageBtn">◀ Previous Page</button>
+                <div class="page-jump-box">
+                    <span id="pageIndicator">Page 1 of 1</span>
+                    <span class="progress-percent" id="progressPercent">(0%)</span>
+                </div>
+                <button class="nav-page-btn" id="nextPageBtn">Next Page ▶</button>
             </div>
         </div>
     </div>
