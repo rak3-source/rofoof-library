@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rofoof | Al-Arabiya Private School Digital Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- مكتبة PDF.js لقراءة ملفات الـ PDF ورسمها بدقة عالية -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- مكتبة StPageFlip لتقليب الصفحات ككتاب حقيقي -->
+    <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+</head>
+<body>
+
+    <header class="official-header">
+        <div class="container header-content">
+            <div class="school-brand">
+                <img src="logo.png" alt="Al-Arabiya Private School Logo" class="school-logo">
+                <div>
+                    <h1>Rofoof Digital Library</h1>
+                    <p>Al-Arabiya Private School — Official Reading Portal</p>
+                </div>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by book title or author...">
+            </div>
+        </div>
+    </header>
+
+    <nav class="categories-bar">
+        <div class="container categories-list" id="categoriesList">
+            <button class="cat-btn active" data-category="all">All Books</button>
+            <button class="cat-btn" data-category="Short Stories">Short Stories</button>
+            <button class="cat-btn" data-category="Novels">Novels</button>
+            <button class="cat-btn" data-category="Science">Science</button>
+            <button class="cat-btn" data-category="History">History</button>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="books-grid" id="booksGrid"></div>
+    </main>
+
+    <!-- نافذة قارئ الكتاب الحقيقي (صفحتين متقابلتين) -->
+    <div class="reader-modal" id="readerModal">
+        <div class="reader-container">
+            <div class="reader-header">
+                <h3 id="modalBookTitle">Book Title</h3>
+                <div class="reader-controls">
+                    <button class="nav-page-btn" id="prevPageBtn">◀ Previous</button>
+                    <span id="pageIndicator">Loading...</span>
+                    <button class="nav-page-btn" id="nextPageBtn">Next ▶</button>
+                    <button class="close-btn" id="closeModalBtn">Close ✕</button>
+                </div>
+            </div>
+            <div class="reader-body flipbook-stage">
+                <div id="loadingSpinner" class="loading-text">Opening Book Pages...</div>
+                <div id="flipbookContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="official-footer">
+        <div class="container">
+            <p>© 2026 All Rights Reserved - Al-Arabiya Private School | Managed by Student HASHEM</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
