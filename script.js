@@ -1,44 +1,21 @@
-// تهيئة محرك PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// كتابك الحقيقي فقط (A Bird in the Hand)
 const booksData = [
     {
         id: 1,
-        title: "Journey to the Center of the Earth",
-        author: "Jules Verne",
-        category: "Novels",
-        cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80",
+        title: "A Bird in the Hand",
+        author: "Randall Garrett",
+        category: "Science Fiction",
+        cover: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=600&q=80",
         pdfUrl: "books/sample1.pdf"
-    },
-    {
-        id: 2,
-        title: "Fundamentals of Space & Astronomy",
-        author: "School Science Department",
-        category: "Science",
-        cover: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80",
-        pdfUrl: "books/sample2.pdf"
-    },
-    {
-        id: 3,
-        title: "Classic Fables & Short Stories",
-        author: "Aesop",
-        category: "Short Stories",
-        cover: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=400&q=80",
-        pdfUrl: "books/sample3.pdf"
-    },
-    {
-        id: 4,
-        title: "Scientists Who Changed History",
-        author: "Dr. Ahmed Zaki",
-        category: "History",
-        cover: "https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=400&q=80",
-        pdfUrl: "books/sample4.pdf"
     }
 ];
 
 const booksGrid = document.getElementById('booksGrid');
 const searchInput = document.getElementById('searchInput');
 const catButtons = document.querySelectorAll('.cat-btn');
+const bookCount = document.getElementById('bookCount');
 const readerModal = document.getElementById('readerModal');
 const modalBookTitle = document.getElementById('modalBookTitle');
 const closeModalBtn = document.getElementById('closeModalBtn');
@@ -53,21 +30,29 @@ let pageFlipInstance = null;
 
 function renderBooks(books) {
     booksGrid.innerHTML = '';
+    bookCount.textContent = `${books.length} ${books.length === 1 ? 'Book' : 'Books'} Available`;
+
     if (books.length === 0) {
-        booksGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #64748b;">No books found matching your search.</p>';
+        booksGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #475569; padding: 40px;">No books found in this section yet.</p>';
         return;
     }
 
     books.forEach(book => {
         const card = document.createElement('div');
         card.className = 'book-card';
+        // الضغط في أي مكان على بطاقة الكتاب يفتح الكتاب فوراً
+        card.onclick = () => openBook(book.title, book.pdfUrl);
+
         card.innerHTML = `
-            <img src="${book.cover}" alt="${book.title}" class="book-cover">
+            <div class="book-cover-wrapper">
+                <img src="${book.cover}" alt="${book.title}" class="book-cover">
+                <span class="book-badge">📖 Flipbook Ready</span>
+            </div>
             <div class="book-info">
                 <span class="book-category">${book.category}</span>
                 <h3 class="book-title">${book.title}</h3>
                 <p class="book-author">By: ${book.author}</p>
-                <button class="read-btn" onclick="openBook('${book.title}', '${book.pdfUrl}')">Read Book</button>
+                <button class="read-btn">Open Book</button>
             </div>
         `;
         booksGrid.appendChild(card);
@@ -95,14 +80,13 @@ catButtons.forEach(btn => {
 
 searchInput.addEventListener('input', filterBooks);
 
-// دالة فتح الكتاب وتحويل صفحات الـ PDF إلى كتاب تفاعلي بصفحتين
 async function openBook(title, url) {
     modalBookTitle.textContent = title;
     readerModal.style.display = 'flex';
     loadingSpinner.style.display = 'block';
+    loadingSpinner.textContent = 'Opening Book Pages...';
     pageIndicator.textContent = 'Loading...';
 
-    // تنظيف أي كتاب سابق
     if (pageFlipInstance) {
         pageFlipInstance.destroy();
         pageFlipInstance = null;
@@ -113,7 +97,6 @@ async function openBook(title, url) {
         const pdf = await pdfjsLib.getDocument(url).promise;
         const totalPages = pdf.numPages;
 
-        // تحويل كل صفحة من الـ PDF إلى عنصر صفحة في الكتاب
         for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 1.5 });
@@ -133,7 +116,6 @@ async function openBook(title, url) {
 
         loadingSpinner.style.display = 'none';
 
-        // تحديد وضع العرض: صفحتان بجانب بعض على الآيباد والكمبيوتر، وصفحة واحدة على الجوال الصغير
         const isMobile = window.innerWidth < 650;
 
         pageFlipInstance = new St.PageFlip(flipbookContainer, {
@@ -145,7 +127,7 @@ async function openBook(title, url) {
             minHeight: 400,
             maxHeight: 750,
             showCover: true,
-            usePortrait: isMobile, // false على الآيباد والكمبيوتر ليعرض صفحتين متقابلتين
+            usePortrait: isMobile,
             mobileScrollSupport: false
         });
 
@@ -157,12 +139,11 @@ async function openBook(title, url) {
         });
 
     } catch (error) {
-        loadingSpinner.textContent = 'Error loading book. Make sure the PDF file exists in the books folder.';
+        loadingSpinner.textContent = 'Make sure the file inside books folder is named sample1.pdf (not sample1.pdf.pdf).';
         console.error(error);
     }
 }
 
-// أزرار تقليب الصفحات
 prevPageBtn.addEventListener('click', () => {
     if (pageFlipInstance) pageFlipInstance.flipPrev();
 });
