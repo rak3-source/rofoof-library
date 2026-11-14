@@ -7,7 +7,7 @@ const booksData = [
         title: "A Bird in the Hand",
         author: "Randall Garrett",
         category: "Science Fiction",
-        cover: "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=600&q=80",
+        cover: "cover1.jpg",
         pdfUrl: "books/sample1.pdf"
     }
 ];
