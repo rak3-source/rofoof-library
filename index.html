@@ -22,90 +22,101 @@
                     <p>Al-Arabiya Private School — Official Reading Portal</p>
                 </div>
             </div>
-            <div class="search-box">
+            <div class="search-box" id="headerSearchBox">
                 <input type="text" id="searchInput" placeholder="Search books by title or author...">
             </div>
         </div>
     </header>
 
-    <nav class="categories-bar">
-        <div class="container categories-list" id="categoriesList">
-            <button class="cat-btn active" data-category="all">All Books</button>
-            <button class="cat-btn" data-category="Science Fiction">Science Fiction</button>
-            <button class="cat-btn" data-category="Short Stories">Short Stories</button>
-            <button class="cat-btn" data-category="Novels">Novels</button>
-            <button class="cat-btn" data-category="Science">Science</button>
-            <button class="cat-btn" data-category="History">History</button>
+    <!-- قائمة الأقسام المنبثقة فوق الشريط السفلي -->
+    <div class="categories-popover" id="categoriesPopover">
+        <div class="popover-title">Browse Categories</div>
+        <div class="popover-grid">
+            <button class="cat-chip active" data-category="all">All Books</button>
+            <button class="cat-chip" data-category="Science Fiction">Science Fiction</button>
+            <button class="cat-chip" data-category="Short Stories">Short Stories</button>
+            <button class="cat-chip" data-category="Novels">Novels</button>
+            <button class="cat-chip" data-category="Science">Science</button>
+            <button class="cat-chip" data-category="History">History</button>
         </div>
-    </nav>
+    </div>
 
     <main class="container main-section">
         <div class="section-header">
-            <h2>Featured Library Collection</h2>
+            <h2 id="currentSectionTitle">All Library Books</h2>
             <span class="book-count" id="bookCount">1 Book Available</span>
         </div>
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- نافذة القارئ الاحترافي المتكامل -->
+    <!-- الشريط السفلي الزجاجي العائم (Floating Glass Dock) -->
+    <nav class="floating-glass-dock" aria-label="Main Navigation">
+        <button class="dock-item active" id="dockHomeBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+            <span>Home</span>
+        </button>
+        <button class="dock-item" id="dockCategoriesBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
+            <span>Categories</span>
+        </button>
+        <button class="dock-item" id="dockSavedBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+            <span>Bookmarked</span>
+        </button>
+        <button class="dock-item" id="dockSearchBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <span>Search</span>
+        </button>
+    </nav>
+
+    <!-- نافذة القارئ الاحترافي -->
     <div class="reader-modal" id="readerModal">
         <div class="reader-container" id="readerContainer">
-            <!-- شريط أدوات القراءة العلوي -->
-            <div class="reader-header">
+            <!-- زر الخروج العائم يظهر فقط في وضع ملء الشاشة الكامل -->
+            <button class="floating-exit-fs" id="exitFullscreenFloatBtn" title="Exit Full Screen">✕ Exit Full Screen</button>
+
+            <div class="reader-header" id="readerHeader">
                 <div class="reader-title-group">
-                    <span class="badge-live">📖 Rofoof Reader</span>
+                    <span class="badge-live">Rofoof Reader</span>
                     <h3 id="modalBookTitle">Book Title</h3>
                 </div>
 
-                <!-- أدوات القراءة الذكية -->
                 <div class="reader-toolbar">
-                    <button class="tool-btn" id="bookmarkBtn" title="Save Reading Position">
-                        🔖 <span id="bookmarkText">Save Bookmark</span>
-                    </button>
-                    <button class="tool-btn" id="goBookmarkBtn" style="display: none;" title="Jump to Saved Page">
-                        📌 Go to Saved (<span id="savedPageNum">1</span>)
-                    </button>
-                    <button class="tool-btn" id="sepiaBtn" title="Eye-Comfort Paper Mode">
-                        🌙 Warm Paper
-                    </button>
-                    <button class="tool-btn" id="zoomOutBtn" title="Zoom Out">➖</button>
-                    <button class="tool-btn" id="zoomInBtn" title="Zoom In">➕</button>
-                    <button class="tool-btn" id="fullscreenBtn" title="Full Screen Mode">
-                        ⛶ Full Screen
-                    </button>
+                    <button class="tool-btn" id="bookmarkBtn">🔖 <span id="bookmarkText">Save Bookmark</span></button>
+                    <button class="tool-btn" id="goBookmarkBtn" style="display: none;">📌 Page <span id="savedPageNum">1</span></button>
+                    <button class="tool-btn" id="sepiaBtn">🌙 Warm Paper</button>
+                    <button class="tool-btn" id="zoomOutBtn">➖</button>
+                    <button class="tool-btn" id="zoomInBtn">➕</button>
+                    <button class="tool-btn" id="fullscreenBtn">⛶ Full Screen</button>
                     <button class="close-btn" id="closeModalBtn">✕</button>
                 </div>
             </div>
 
-            <!-- شريط التقدم الذهبي -->
-            <div class="reading-progress-track">
+            <div class="reading-progress-track" id="progressTrack">
                 <div class="reading-progress-fill" id="readingProgressFill"></div>
             </div>
 
-            <!-- منصة الكتاب مع الكعب الذهبي الفاصل -->
             <div class="reader-body flipbook-stage" id="flipbookStage">
                 <div id="loadingSpinner" class="loading-text">Opening Book Pages...</div>
-                
-                <!-- الشريط الذهبي المرجعي (Bookmark Ribbon) -->
+
                 <div class="gold-bookmark-ribbon" id="goldBookmarkRibbon" style="display: none;">
                     <span>🔖 Saved</span>
                 </div>
 
                 <div class="book-wrapper" id="bookWrapper">
                     <div id="flipbookContainer"></div>
-                    <!-- الفاصل الذهبي الملكي بين الصفحتين -->
-                    <div class="golden-book-spine" id="goldenSpine"></div>
+                    <!-- فاصلة الكتاب الواقعية الفاخرة (تستخدم spine.png تلقائياً إن وُجدت) -->
+                    <div class="realistic-book-spine" id="goldenSpine"></div>
                 </div>
             </div>
 
-            <!-- شريط التنقل السفلي -->
-            <div class="reader-footer-bar">
-                <button class="nav-page-btn" id="prevPageBtn">◀ Previous Page</button>
+            <div class="reader-footer-bar" id="readerFooter">
+                <button class="nav-page-btn" id="prevPageBtn">◀ Previous</button>
                 <div class="page-jump-box">
                     <span id="pageIndicator">Page 1 of 1</span>
                     <span class="progress-percent" id="progressPercent">(0%)</span>
                 </div>
-                <button class="nav-page-btn" id="nextPageBtn">Next Page ▶</button>
+                <button class="nav-page-btn" id="nextPageBtn">Next ▶</button>
             </div>
         </div>
     </div>
