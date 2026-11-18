@@ -28,19 +28,6 @@
         </div>
     </header>
 
-    <!-- شريط الأقسام الأصلي بتصميم زجاجي شفاف وثابت لا يتحرك -->
-    <nav class="glass-categories-bar">
-        <div class="container categories-list" id="categoriesList">
-            <button class="cat-btn active" data-category="all">All Books</button>
-            <button class="cat-btn" data-category="School Book">School Book</button>
-            <button class="cat-btn" data-category="Science Fiction">Science Fiction</button>
-            <button class="cat-btn" data-category="Short Stories">Short Stories</button>
-            <button class="cat-btn" data-category="Novels">Novels</button>
-            <button class="cat-btn" data-category="Science">Science</button>
-            <button class="cat-btn" data-category="History">History</button>
-        </div>
-    </nav>
-
     <main class="container main-section">
         <div class="section-header">
             <h2 id="sectionTitle">Featured Library Collection</h2>
@@ -49,33 +36,74 @@
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- نافذة القارئ بنفس التصميم وأماكن الأدوات الأصلية -->
+    <!-- قائمة الأقسام الزجاجية العائمة فوق الشريط السفلي (الصورة 1) -->
+    <div class="floating-categories-box" id="categoriesPopover">
+        <div class="popover-title">BROWSE CATEGORIES</div>
+        <div class="popover-grid">
+            <button class="cat-chip active" data-category="all">All Books</button>
+            <button class="cat-chip" data-category="School Book">School Book</button>
+            <button class="cat-chip" data-category="Science Fiction">Science Fiction</button>
+            <button class="cat-chip" data-category="Short Stories">Short Stories</button>
+            <button class="cat-chip" data-category="Novels">Novels</button>
+            <button class="cat-chip" data-category="Science">Science</button>
+            <button class="cat-chip" data-category="History">History</button>
+        </div>
+    </div>
+
+    <!-- الشريط السفلي الزجاجي الثابت (الصورة 1 بالأزرق والبرتقالي) -->
+    <nav class="floating-glass-dock" aria-label="Main Navigation">
+        <button class="dock-item active" id="dockHomeBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
+            <span>Home</span>
+        </button>
+        <button class="dock-item" id="dockCategoriesBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/></svg>
+            <span>Categories</span>
+        </button>
+        <button class="dock-item" id="dockSavedBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+            <span>Bookmarked</span>
+        </button>
+        <button class="dock-item" id="dockSearchBtn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <span>Search</span>
+        </button>
+    </nav>
+
+    <!-- قارئ الكتاب بملء الشاشة الفوري مع لوحة أدوات جانبية قابلة للفتح والإغلاق -->
     <div class="reader-modal" id="readerModal">
         <div class="reader-container" id="readerContainer">
-            <button class="floating-exit-fs" id="exitFullscreenFloatBtn">✕ Exit Full Screen</button>
-
-            <div class="reader-header" id="readerHeader">
-                <div class="reader-title-group">
-                    <span class="badge-live">📖 Rofoof Reader</span>
-                    <h3 id="modalBookTitle">Book Title</h3>
-                </div>
-
-                <div class="reader-toolbar">
-                    <button class="tool-btn" id="bookmarkBtn">🔖 <span id="bookmarkText">Save Bookmark</span></button>
-                    <button class="tool-btn" id="goBookmarkBtn" style="display: none;">📌 Page <span id="savedPageNum">1</span></button>
-                    <button class="tool-btn" id="sepiaBtn">🌙 Night Mode</button>
-                    <button class="tool-btn" id="zoomOutBtn">➖</button>
-                    <button class="tool-btn" id="zoomInBtn">➕</button>
-                    <button class="tool-btn" id="fullscreenBtn">⛶ Full Screen</button>
-                    <button class="close-btn" id="closeModalBtn">✕</button>
-                </div>
-            </div>
-
+            
+            <!-- شريط التقدم الرفيع في أعلى الشاشة -->
             <div class="reading-progress-track">
                 <div class="reading-progress-fill" id="readingProgressFill"></div>
             </div>
 
-            <div class="reader-body flipbook-stage" id="flipbookStage">
+            <!-- زر فتح/إغلاق الأدوات بجانب الصفحة اليمنى -->
+            <button class="side-tools-toggle" id="sideToolsToggle" title="Reading Tools">
+                ☰
+            </button>
+
+            <!-- قائمة الأدوات الجانبية القابلة للفتح والإغلاق -->
+            <aside class="side-tools-drawer" id="sideToolsDrawer">
+                <div class="drawer-book-title" id="modalBookTitle">A Bird in the Hand</div>
+                <div class="drawer-page-stat" id="pageIndicator">Page 1 of 1 (0%)</div>
+                
+                <button class="drawer-btn" id="bookmarkBtn">🔖 <span id="bookmarkText">Save Bookmark</span></button>
+                <button class="drawer-btn" id="goBookmarkBtn" style="display: none;">📌 Go to Saved (<span id="savedPageNum">1</span>)</button>
+                <button class="drawer-btn" id="warmModeBtn">☀️ Warm Mode</button>
+                
+                <div class="drawer-zoom-row">
+                    <button class="drawer-btn" id="zoomOutBtn">➖ Zoom</button>
+                    <button class="drawer-btn" id="zoomInBtn">➕ Zoom</button>
+                </div>
+
+                <button class="drawer-btn" id="fullscreenBtn">⛶ Full Screen</button>
+                <button class="drawer-btn drawer-close-btn" id="closeModalBtn">✕ Close Book</button>
+            </aside>
+
+            <!-- منصة الكتاب: تملأ الشاشة فوراً وتلقائياً -->
+            <div class="flipbook-stage" id="flipbookStage">
                 <div id="loadingSpinner" class="loading-text">Opening Book Pages...</div>
 
                 <div class="orange-bookmark-ribbon" id="goldBookmarkRibbon" style="display: none;">
@@ -84,18 +112,15 @@
 
                 <div class="book-wrapper" id="bookWrapper">
                     <div id="flipbookContainer"></div>
-                    <div class="book-center-spine" id="goldenSpine"></div>
+                    <!-- الفاصلة الواقعية بالتظليل ثلاثي الأبعاد -->
+                    <div class="realistic-gutter-shadow" id="goldenSpine"></div>
                 </div>
+
+                <!-- أسهم تقليب سريعة وشفافة على الأطراف -->
+                <button class="edge-nav-btn edge-prev" id="prevPageBtn" title="Previous Page">‹</button>
+                <button class="edge-nav-btn edge-next" id="nextPageBtn" title="Next Page">›</button>
             </div>
 
-            <div class="reader-footer-bar" id="readerFooter">
-                <button class="nav-page-btn" id="prevPageBtn">◀ Previous Page</button>
-                <div class="page-jump-box">
-                    <span id="pageIndicator">Page 1 of 1</span>
-                    <span class="progress-percent" id="progressPercent">(0%)</span>
-                </div>
-                <button class="nav-page-btn" id="nextPageBtn">Next Page ▶</button>
-            </div>
         </div>
     </div>
 
