@@ -30,7 +30,7 @@ const pageIndicator = document.getElementById('pageIndicator');
 const progressPercent = document.getElementById('progressPercent');
 const readingProgressFill = document.getElementById('readingProgressFill');
 
-// عناصر الشريط السفلي الزجاجي
+// الشريط السفلي الزجاجي الثابت
 const dockHomeBtn = document.getElementById('dockHomeBtn');
 const dockCategoriesBtn = document.getElementById('dockCategoriesBtn');
 const dockSavedBtn = document.getElementById('dockSavedBtn');
@@ -59,9 +59,6 @@ let totalBookPages = 1;
 let currentZoom = 1;
 let isPureFullscreen = false;
 
-// مصفوفة لحفظ عناصر الصفحات الحقيقية مع رسومات الـ Canvas دون فقدانها
-let cachedPageElements = [];
-
 const customSpineImg = new Image();
 customSpineImg.src = 'spine.png';
 customSpineImg.onload = () => {
@@ -74,13 +71,13 @@ function renderBooks(books) {
     bookCount.textContent = `${books.length} ${books.length === 1 ? 'Book' : 'Books'} Available`;
 
     if (books.length === 0) {
-        booksGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #526b60; padding: 40px;">No books found matching your selection.</p>';
+        booksGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #475569; padding: 40px;">No books found in this category yet.</p>';
         return;
     }
 
     books.forEach(book => {
         const savedPage = localStorage.getItem(`rofoof_bookmark_${book.id}`);
-        const badgeLabel = savedPage ? `🔖 Page ${parseInt(savedPage) + 1}` : '📖 Flipbook Ready';
+        const badgeLabel = savedPage !== null ? `🔖 Page ${parseInt(savedPage) + 1}` : '📖 Flipbook Ready';
 
         const card = document.createElement('div');
         card.className = 'book-card';
@@ -95,7 +92,7 @@ function renderBooks(books) {
                 <span class="book-category">${book.category}</span>
                 <h3 class="book-title">${book.title}</h3>
                 <p class="book-author">By: ${book.author}</p>
-                <button class="read-btn">${savedPage ? 'Continue Reading' : 'Open Book'}</button>
+                <button class="read-btn">${savedPage !== null ? 'Continue Reading' : 'Open Book'}</button>
             </div>
         `;
         booksGrid.appendChild(card);
@@ -168,58 +165,11 @@ document.addEventListener('click', (e) => {
 
 searchInput.addEventListener('input', filterBooks);
 
-// إعادة بناء القارئ باستخدام العناصر المحفوظة دون فقدان رسومات الـ Canvas
-function rebuildFlipbook(startPage = 0) {
-    if (cachedPageElements.length === 0) return;
-
-    if (pageFlipInstance) {
-        pageFlipInstance.destroy();
-        pageFlipInstance = null;
-    }
-
-    flipbookContainer.innerHTML = '';
-    cachedPageElements.forEach(pageEl => {
-        // إزالة أي كلاسات سابقة أضافتها مكتبة PageFlip
-        pageEl.className = 'page-sheet';
-        pageEl.removeAttribute('style');
-        flipbookContainer.appendChild(pageEl);
-    });
-
-    const isMobile = window.innerWidth < 650;
-    goldenSpine.style.display = isMobile ? 'none' : 'block';
-
-    const stageWidth = isPureFullscreen ? window.innerWidth : Math.max(flipbookStage.clientWidth - 24, 300);
-    const stageHeight = isPureFullscreen ? window.innerHeight : Math.max(flipbookStage.clientHeight - 24, 400);
-
-    const singlePageWidth = isMobile ? stageWidth : Math.floor(stageWidth / 2);
-    const singlePageHeight = stageHeight;
-
-    pageFlipInstance = new St.PageFlip(flipbookContainer, {
-        width: singlePageWidth,
-        height: singlePageHeight,
-        size: "stretch",
-        minWidth: 250,
-        maxWidth: 1400,
-        minHeight: 320,
-        maxHeight: 1600,
-        showCover: false,
-        usePortrait: isMobile,
-        mobileScrollSupport: false
-    });
-
-    pageFlipInstance.loadFromHTML(cachedPageElements);
-
-    if (startPage > 0 && startPage < totalBookPages) {
-        setTimeout(() => {
-            if (pageFlipInstance) pageFlipInstance.turnToPage(startPage);
-        }, 80);
-    }
-
-    updateReadingUI(startPage);
-
-    pageFlipInstance.on('flip', (e) => {
-        updateReadingUI(e.data);
-    });
+function isCurrentPageBookmarked() {
+    const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
+    if (saved === null) return false;
+    const savedIdx = parseInt(saved);
+    return savedIdx === currentPageIndex || savedIdx === currentPageIndex + 1;
 }
 
 function updateReadingUI(pageIdx) {
@@ -237,9 +187,9 @@ function updateReadingUI(pageIdx) {
         savedPageNum.textContent = savedIdx + 1;
         goBookmarkBtn.style.display = 'inline-block';
 
-        if (savedIdx === pageIdx || savedIdx === pageIdx + 1) {
+        if (isCurrentPageBookmarked()) {
             goldBookmarkRibbon.style.display = 'block';
-            bookmarkText.textContent = 'Bookmarked';
+            bookmarkText.textContent = 'Remove Bookmark';
             bookmarkBtn.classList.add('active-tool');
         } else {
             goldBookmarkRibbon.style.display = 'none';
@@ -258,7 +208,6 @@ async function openBook(book) {
     currentBookId = book.id;
     currentZoom = 1;
     isPureFullscreen = false;
-    cachedPageElements = [];
     readerContainer.classList.remove('is-pure-fullscreen');
     bookWrapper.style.transform = 'scale(1)';
     modalBookTitle.textContent = book.title;
@@ -290,14 +239,46 @@ async function openBook(book) {
 
             await page.render({ canvasContext: context, viewport: viewport }).promise;
             pageDiv.appendChild(canvas);
-            cachedPageElements.push(pageDiv);
+            flipbookContainer.appendChild(pageDiv);
         }
 
         loadingSpinner.style.display = 'none';
 
+        const isMobile = window.innerWidth < 650;
+        goldenSpine.style.display = isMobile ? 'none' : 'block';
+
+        const stageWidth = Math.max(flipbookStage.clientWidth - 24, 300);
+        const stageHeight = Math.max(flipbookStage.clientHeight - 24, 400);
+
+        pageFlipInstance = new St.PageFlip(flipbookContainer, {
+            width: isMobile ? stageWidth : Math.floor(stageWidth / 2),
+            height: stageHeight,
+            size: "stretch",
+            minWidth: 250,
+            maxWidth: 1400,
+            minHeight: 320,
+            maxHeight: 1600,
+            showCover: false,
+            usePortrait: isMobile,
+            mobileScrollSupport: false
+        });
+
+        pageFlipInstance.loadFromHTML(document.querySelectorAll('.page-sheet'));
+
         const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
-        const startPage = saved ? parseInt(saved) : 0;
-        rebuildFlipbook(startPage);
+        const startPage = saved !== null ? parseInt(saved) : 0;
+
+        if (startPage > 0 && startPage < totalBookPages) {
+            setTimeout(() => {
+                if (pageFlipInstance) pageFlipInstance.turnToPage(startPage);
+            }, 100);
+        }
+
+        updateReadingUI(startPage);
+
+        pageFlipInstance.on('flip', (e) => {
+            updateReadingUI(e.data);
+        });
 
     } catch (error) {
         loadingSpinner.textContent = 'Error loading PDF file.';
@@ -305,47 +286,14 @@ async function openBook(book) {
     }
 }
 
-function togglePureFullscreen(enable) {
-    isPureFullscreen = enable;
-    if (enable) {
-        readerContainer.classList.add('is-pure-fullscreen');
-        if (readerContainer.requestFullscreen) {
-            readerContainer.requestFullscreen().catch(() => {});
-        } else if (readerContainer.webkitRequestFullscreen) {
-            readerContainer.webkitRequestFullscreen();
-        }
-    } else {
-        readerContainer.classList.remove('is-pure-fullscreen');
-        if (document.fullscreenElement && document.exitFullscreen) {
-            document.exitFullscreen().catch(() => {});
-        }
-    }
-
-    setTimeout(() => {
-        rebuildFlipbook(currentPageIndex);
-    }, 150);
-}
-
-fullscreenBtn.addEventListener('click', () => togglePureFullscreen(true));
-exitFullscreenFloatBtn.addEventListener('click', () => togglePureFullscreen(false));
-
-document.addEventListener('fullscreenchange', () => {
-    if (!document.fullscreenElement && isPureFullscreen) {
-        isPureFullscreen = false;
-        readerContainer.classList.remove('is-pure-fullscreen');
-        setTimeout(() => rebuildFlipbook(currentPageIndex), 150);
-    }
-});
-
-window.addEventListener('resize', () => {
-    if (readerModal.style.display === 'flex' && cachedPageElements.length > 0) {
-        rebuildFlipbook(currentPageIndex);
-    }
-});
-
+// زر البوك مارك: يضيف العلامة وإذا ضغطت عليه مجدداً يزيلها فوراً
 bookmarkBtn.addEventListener('click', () => {
     if (!currentBookId) return;
-    localStorage.setItem(`rofoof_bookmark_${currentBookId}`, currentPageIndex);
+    if (isCurrentPageBookmarked()) {
+        localStorage.removeItem(`rofoof_bookmark_${currentBookId}`);
+    } else {
+        localStorage.setItem(`rofoof_bookmark_${currentBookId}`, currentPageIndex);
+    }
     updateReadingUI(currentPageIndex);
     filterBooks();
 });
@@ -357,6 +305,40 @@ goBookmarkBtn.addEventListener('click', () => {
     }
 });
 
+// وضع ملء الشاشة الآمن (يكبّر الكتاب ليملأ الشاشة دون تدمير الصفحات أو ظهور شاشة سوداء)
+function togglePureFullscreen(enable) {
+    isPureFullscreen = enable;
+    if (enable) {
+        readerContainer.classList.add('is-pure-fullscreen');
+        if (readerContainer.requestFullscreen) {
+            readerContainer.requestFullscreen().catch(() => {});
+        } else if (readerContainer.webkitRequestFullscreen) {
+            readerContainer.webkitRequestFullscreen();
+        }
+        // تكبير الكتاب بسلاسة ليملأ الشاشة بالكامل دون إعادة بناء الـ Canvas
+        bookWrapper.style.transform = 'scale(1.16)';
+    } else {
+        readerContainer.classList.remove('is-pure-fullscreen');
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+        }
+        bookWrapper.style.transform = `scale(${currentZoom})`;
+    }
+    if (pageFlipInstance) {
+        setTimeout(() => pageFlipInstance.update(), 100);
+    }
+}
+
+fullscreenBtn.addEventListener('click', () => togglePureFullscreen(true));
+exitFullscreenFloatBtn.addEventListener('click', () => togglePureFullscreen(false));
+
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && isPureFullscreen) {
+        togglePureFullscreen(false);
+    }
+});
+
+// الوضع الليلي / الورق الدافئ لكامل الكتاب الأبيض
 sepiaBtn.addEventListener('click', () => {
     bookWrapper.classList.toggle('sepia-mode');
     sepiaBtn.classList.toggle('active-tool');
@@ -385,18 +367,13 @@ nextPageBtn.addEventListener('click', () => {
 });
 
 closeModalBtn.addEventListener('click', () => {
-    if (isPureFullscreen) {
-        isPureFullscreen = false;
-        readerContainer.classList.remove('is-pure-fullscreen');
-        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-    }
+    if (isPureFullscreen) togglePureFullscreen(false);
     readerModal.style.display = 'none';
     if (pageFlipInstance) {
         pageFlipInstance.destroy();
         pageFlipInstance = null;
     }
     flipbookContainer.innerHTML = '';
-    cachedPageElements = [];
     filterBooks();
 });
 
