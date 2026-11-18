@@ -59,7 +59,9 @@ let totalBookPages = 1;
 let currentZoom = 1;
 let isPureFullscreen = false;
 
-// التحقق تلقائياً إذا قام المستخدم برفع صورة فاصلة مخصصة باسم spine.png
+// مصفوفة لحفظ عناصر الصفحات الحقيقية مع رسومات الـ Canvas دون فقدانها
+let cachedPageElements = [];
+
 const customSpineImg = new Image();
 customSpineImg.src = 'spine.png';
 customSpineImg.onload = () => {
@@ -111,7 +113,6 @@ function filterBooks() {
     renderBooks(filtered);
 }
 
-// تحكم أزرار الشريط السفلي العائم
 function setActiveDock(btn) {
     [dockHomeBtn, dockCategoriesBtn, dockSavedBtn, dockSearchBtn].forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -167,18 +168,28 @@ document.addEventListener('click', (e) => {
 
 searchInput.addEventListener('input', filterBooks);
 
-// بناء القارئ بأبعاد تتناسب تلقائياً مع الشاشة سواء في الوضع العادي أو ملء الشاشة الكامل
-function initFlipbookLayout(startPage = 0) {
+// إعادة بناء القارئ باستخدام العناصر المحفوظة دون فقدان رسومات الـ Canvas
+function rebuildFlipbook(startPage = 0) {
+    if (cachedPageElements.length === 0) return;
+
     if (pageFlipInstance) {
         pageFlipInstance.destroy();
+        pageFlipInstance = null;
     }
+
+    flipbookContainer.innerHTML = '';
+    cachedPageElements.forEach(pageEl => {
+        // إزالة أي كلاسات سابقة أضافتها مكتبة PageFlip
+        pageEl.className = 'page-sheet';
+        pageEl.removeAttribute('style');
+        flipbookContainer.appendChild(pageEl);
+    });
 
     const isMobile = window.innerWidth < 650;
     goldenSpine.style.display = isMobile ? 'none' : 'block';
 
-    // حساب الأبعاد المثالية لملء المساحة المتاحة بدقة دون قص أي طرف
-    const stageWidth = isPureFullscreen ? window.innerWidth : flipbookStage.clientWidth - 24;
-    const stageHeight = isPureFullscreen ? window.innerHeight : flipbookStage.clientHeight - 24;
+    const stageWidth = isPureFullscreen ? window.innerWidth : Math.max(flipbookStage.clientWidth - 24, 300);
+    const stageHeight = isPureFullscreen ? window.innerHeight : Math.max(flipbookStage.clientHeight - 24, 400);
 
     const singlePageWidth = isMobile ? stageWidth : Math.floor(stageWidth / 2);
     const singlePageHeight = stageHeight;
@@ -188,18 +199,20 @@ function initFlipbookLayout(startPage = 0) {
         height: singlePageHeight,
         size: "stretch",
         minWidth: 250,
-        maxWidth: 1200,
+        maxWidth: 1400,
         minHeight: 320,
-        maxHeight: 1400,
+        maxHeight: 1600,
         showCover: false,
         usePortrait: isMobile,
         mobileScrollSupport: false
     });
 
-    pageFlipInstance.loadFromHTML(document.querySelectorAll('.page-sheet'));
+    pageFlipInstance.loadFromHTML(cachedPageElements);
 
     if (startPage > 0 && startPage < totalBookPages) {
-        setTimeout(() => pageFlipInstance.flip(startPage), 150);
+        setTimeout(() => {
+            if (pageFlipInstance) pageFlipInstance.turnToPage(startPage);
+        }, 80);
     }
 
     updateReadingUI(startPage);
@@ -241,12 +254,11 @@ function updateReadingUI(pageIdx) {
     }
 }
 
-let cachedPagesHTML = '';
-
 async function openBook(book) {
     currentBookId = book.id;
     currentZoom = 1;
     isPureFullscreen = false;
+    cachedPageElements = [];
     readerContainer.classList.remove('is-pure-fullscreen');
     bookWrapper.style.transform = 'scale(1)';
     modalBookTitle.textContent = book.title;
@@ -278,15 +290,14 @@ async function openBook(book) {
 
             await page.render({ canvasContext: context, viewport: viewport }).promise;
             pageDiv.appendChild(canvas);
-            flipbookContainer.appendChild(pageDiv);
+            cachedPageElements.push(pageDiv);
         }
 
-        cachedPagesHTML = flipbookContainer.innerHTML;
         loadingSpinner.style.display = 'none';
 
         const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
         const startPage = saved ? parseInt(saved) : 0;
-        initFlipbookLayout(startPage);
+        rebuildFlipbook(startPage);
 
     } catch (error) {
         loadingSpinner.textContent = 'Error loading PDF file.';
@@ -294,7 +305,6 @@ async function openBook(book) {
     }
 }
 
-// تفعيل وضع ملء الشاشة الكامل الحقيقي (الكتاب فقط يملأ كامل الشاشة من الحافة للحافة)
 function togglePureFullscreen(enable) {
     isPureFullscreen = enable;
     if (enable) {
@@ -311,11 +321,9 @@ function togglePureFullscreen(enable) {
         }
     }
 
-    // إعادة ضبط أبعاد الكتاب فوراً لتتطابق مع أطراف الشاشة الجديدة
     setTimeout(() => {
-        flipbookContainer.innerHTML = cachedPagesHTML;
-        initFlipbookLayout(currentPageIndex);
-    }, 120);
+        rebuildFlipbook(currentPageIndex);
+    }, 150);
 }
 
 fullscreenBtn.addEventListener('click', () => togglePureFullscreen(true));
@@ -323,14 +331,15 @@ exitFullscreenFloatBtn.addEventListener('click', () => togglePureFullscreen(fals
 
 document.addEventListener('fullscreenchange', () => {
     if (!document.fullscreenElement && isPureFullscreen) {
-        togglePureFullscreen(false);
+        isPureFullscreen = false;
+        readerContainer.classList.remove('is-pure-fullscreen');
+        setTimeout(() => rebuildFlipbook(currentPageIndex), 150);
     }
 });
 
 window.addEventListener('resize', () => {
-    if (readerModal.style.display === 'flex' && cachedPagesHTML) {
-        flipbookContainer.innerHTML = cachedPagesHTML;
-        initFlipbookLayout(currentPageIndex);
+    if (readerModal.style.display === 'flex' && cachedPageElements.length > 0) {
+        rebuildFlipbook(currentPageIndex);
     }
 });
 
@@ -376,13 +385,18 @@ nextPageBtn.addEventListener('click', () => {
 });
 
 closeModalBtn.addEventListener('click', () => {
-    if (isPureFullscreen) togglePureFullscreen(false);
+    if (isPureFullscreen) {
+        isPureFullscreen = false;
+        readerContainer.classList.remove('is-pure-fullscreen');
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    }
     readerModal.style.display = 'none';
     if (pageFlipInstance) {
         pageFlipInstance.destroy();
         pageFlipInstance = null;
     }
     flipbookContainer.innerHTML = '';
+    cachedPageElements = [];
     filterBooks();
 });
 
