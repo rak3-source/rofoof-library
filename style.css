@@ -1,10 +1,11 @@
 :root {
-    --brand-blue-deep: #0b2545;
-    --brand-blue: #134074;
-    --brand-blue-light: #eef4fc;
-    --brand-orange: #f97316;
-    --brand-orange-dark: #ea580c;
-    --bg-canvas: #f4f7fb;
+    --blue-deep: #0b2545;
+    --blue-main: #134074;
+    --blue-soft: #eef4fc;
+    --orange-main: #f97316;
+    --orange-dark: #ea580c;
+    --orange-light: #ffedd5;
+    --bg-page: #f5f7fa;
     --text-dark: #0f172a;
     --text-muted: #475569;
     --white: #ffffff;
@@ -16,19 +17,13 @@
     padding: 0;
 }
 
-html, body {
-    width: 100%;
-    overflow-x: hidden;
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-canvas);
-    color: var(--text-dark);
-    min-height: 100vh;
-}
-
 body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-dark);
     display: flex;
     flex-direction: column;
-    padding-bottom: 105px;
+    min-height: 100vh;
 }
 
 .container {
@@ -40,11 +35,11 @@ body {
 
 /* الهيدر الرسمي بالأزرق الملكي والبرتقالي */
 .official-header {
-    background: linear-gradient(135deg, var(--brand-blue-deep) 0%, var(--brand-blue) 100%);
+    background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue-main) 100%);
     color: var(--white);
-    padding: 18px 0;
-    border-bottom: 4px solid var(--brand-orange);
-    box-shadow: 0 6px 24px rgba(11, 37, 69, 0.22);
+    padding: 20px 0;
+    border-bottom: 4px solid var(--orange-main);
+    box-shadow: 0 4px 20px rgba(11, 37, 69, 0.25);
 }
 
 .header-content {
@@ -52,23 +47,23 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 18px;
 }
 
 .school-brand {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
 }
 
 .logo-royal-frame {
-    width: 68px;
-    height: 68px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
     background: var(--white);
-    padding: 4px;
-    border: 3px solid var(--brand-orange);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.28);
+    padding: 5px;
+    border: 3px solid var(--orange-main);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -84,181 +79,92 @@ body {
 
 .school-brand h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.75rem;
+    font-size: 1.8rem;
     color: var(--white);
 }
 
 .school-brand p {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     color: #fed7aa;
-    margin-top: 2px;
+    margin-top: 3px;
     font-weight: 500;
 }
 
-/* شريط البحث الزجاجي الشفاف */
-.glass-search-box {
-    position: relative;
+.search-box input {
     width: 300px;
     max-width: 100%;
-}
-
-.search-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    color: #fed7aa;
-    pointer-events: none;
-}
-
-.glass-search-box input {
-    width: 100%;
-    padding: 11px 18px 11px 40px;
+    padding: 11px 18px;
     border-radius: 30px;
-    border: 1.5px solid rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.16);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    border: 2px solid rgba(249, 115, 22, 0.6);
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     color: var(--white);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     outline: none;
     transition: all 0.25s ease;
 }
 
-.glass-search-box input::placeholder {
-    color: #e2e8f0;
+.search-box input::placeholder {
+    color: #dbeafe;
 }
 
-.glass-search-box input:focus {
-    background: rgba(255, 255, 255, 0.95);
+.search-box input:focus {
+    background: var(--white);
     color: var(--text-dark);
-    border-color: var(--brand-orange);
+    border-color: var(--orange-main);
 }
 
-/* ========================================================
-   شريط Apple Books الزجاجي الثابت (Fixed Liquid Glass Dock)
-   ======================================================== */
-.apple-glass-dock {
-    position: fixed !important;
-    bottom: 20px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 950;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
-    border-radius: 50px;
-    /* شفافية زجاجية حقيقية مثل Apple Books */
-    background: rgba(255, 255, 255, 0.58);
-    backdrop-filter: blur(24px) saturate(190%);
-    -webkit-backdrop-filter: blur(24px) saturate(190%);
-    border: 1.5px solid rgba(255, 255, 255, 0.75);
-    box-shadow: 0 12px 35px rgba(11, 37, 69, 0.22), inset 0 1px 2px rgba(255, 255, 255, 0.8);
-    width: max-content;
-    max-width: 94vw;
+/* شريط الأقسام الأصلي بتأثير زجاجي شفاف وثابت لا يتحرك */
+.glass-categories-bar {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    padding: 12px 0;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(19, 64, 116, 0.14);
+    box-shadow: 0 4px 16px rgba(11, 37, 69, 0.06);
 }
 
-.dock-item {
-    background: transparent;
-    border: none;
-    color: var(--brand-blue-deep);
+.categories-list {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+.cat-btn {
+    background: rgba(11, 37, 69, 0.07);
+    color: var(--blue-deep);
+    border: 1px solid rgba(11, 37, 69, 0.12);
     padding: 8px 18px;
-    border-radius: 40px;
-    cursor: pointer;
-    font-size: 0.76rem;
+    border-radius: 25px;
     font-weight: 700;
-    transition: all 0.25s ease;
-}
-
-.dock-item svg {
-    width: 22px;
-    height: 22px;
-}
-
-.dock-item:hover {
-    background: rgba(19, 64, 116, 0.1);
-}
-
-.dock-item.active {
-    background: linear-gradient(135deg, var(--brand-orange), var(--brand-orange-dark));
-    color: var(--white);
-    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
-}
-
-/* قائمة الأقسام الزجاجية الثابتة */
-.glass-categories-popover {
-    position: fixed !important;
-    bottom: 98px !important;
-    left: 50% !important;
-    transform: translateX(-50%) translateY(15px);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 949;
-    width: 92%;
-    max-width: 460px;
-    padding: 18px;
-    border-radius: 26px;
-    background: rgba(255, 255, 255, 0.72);
-    backdrop-filter: blur(26px) saturate(190%);
-    -webkit-backdrop-filter: blur(26px) saturate(190%);
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-    box-shadow: 0 20px 45px rgba(11, 37, 69, 0.25);
-    transition: all 0.25s ease;
-}
-
-.glass-categories-popover.open {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
-}
-
-.popover-title {
-    color: var(--brand-blue-deep);
-    font-size: 0.82rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 12px;
-    text-align: center;
-}
-
-.popover-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-}
-
-.cat-chip {
-    background: rgba(11, 37, 69, 0.08);
-    color: var(--brand-blue-deep);
-    border: 1px solid rgba(11, 37, 69, 0.15);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 0.84rem;
-    font-weight: 700;
+    font-size: 0.88rem;
     cursor: pointer;
-    transition: all 0.2s;
+    white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
-.cat-chip.active, .cat-chip:hover {
-    background: var(--brand-blue);
+.cat-btn:hover {
+    background: var(--orange-light);
+    color: var(--orange-dark);
+    border-color: var(--orange-main);
+}
+
+.cat-btn.active {
+    background: linear-gradient(135deg, var(--orange-main), var(--orange-dark));
     color: var(--white);
-    border-color: var(--brand-blue);
+    border-color: var(--orange-main);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
 }
 
 /* القسم الرئيسي وبطاقات الكتب */
 .main-section {
     flex: 1;
-    padding: 32px 20px;
+    padding: 36px 20px;
 }
 
 .section-header {
@@ -271,33 +177,33 @@ body {
 }
 
 .section-header h2 {
-    color: var(--brand-blue-deep);
-    font-size: 1.35rem;
+    color: var(--blue-deep);
+    font-size: 1.4rem;
     font-weight: 800;
 }
 
 .book-count {
-    background: var(--brand-blue-light);
-    color: var(--brand-blue-deep);
+    background: var(--blue-soft);
+    color: var(--blue-deep);
     padding: 6px 14px;
     border-radius: 20px;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     font-weight: 700;
-    border: 1px solid var(--brand-orange);
+    border: 1px solid var(--orange-main);
 }
 
 .books-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 26px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 28px;
 }
 
 .book-card {
     background: var(--white);
-    border-radius: 18px;
+    border-radius: 16px;
     overflow: hidden;
     border: 1px solid #dbe4f0;
-    border-left: 7px solid var(--brand-blue);
+    border-left: 8px solid var(--blue-main);
     box-shadow: 0 10px 25px rgba(11, 37, 69, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
@@ -308,13 +214,13 @@ body {
 .book-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 18px 35px rgba(11, 37, 69, 0.16);
-    border-color: var(--brand-orange);
+    border-color: var(--orange-main);
 }
 
 .book-cover-wrapper {
     position: relative;
-    height: 300px;
-    background: var(--brand-blue-deep);
+    height: 310px;
+    background: var(--blue-deep);
     overflow: hidden;
 }
 
@@ -334,53 +240,53 @@ body {
     border-radius: 20px;
     font-size: 0.78rem;
     font-weight: 700;
-    border: 1px solid var(--brand-orange);
+    border: 1px solid var(--orange-main);
 }
 
 .book-info {
-    padding: 18px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
 .book-category {
-    color: var(--brand-orange-dark);
-    font-size: 0.78rem;
+    color: var(--orange-dark);
+    font-size: 0.8rem;
     font-weight: 800;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 .book-title {
-    font-size: 1.18rem;
+    font-size: 1.2rem;
     font-weight: 800;
     color: var(--text-dark);
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 .book-author {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .read-btn {
     margin-top: auto;
     width: 100%;
-    background: linear-gradient(135deg, var(--brand-blue-deep), var(--brand-blue));
+    background: linear-gradient(135deg, var(--blue-deep), var(--blue-main));
     color: var(--white);
-    border: 1px solid var(--brand-orange);
-    padding: 11px;
-    border-radius: 12px;
+    border: 1px solid var(--orange-main);
+    padding: 12px;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     cursor: pointer;
 }
 
-/* ========================================================
-   نافذة القارئ الاحترافي (بدون أي اختفاء للصفحة)
-   ======================================================== */
+/* =========================================
+   نافذة القارئ وأدوات القراءة
+   ========================================= */
 .reader-modal {
     display: none;
     position: fixed;
@@ -394,7 +300,7 @@ body {
 }
 
 .reader-container {
-    background: #0f172a;
+    background: #111827;
     width: 100%;
     max-width: 1250px;
     height: 95vh;
@@ -402,11 +308,11 @@ body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border: 2px solid var(--brand-orange);
+    border: 2px solid var(--orange-main);
     position: relative;
 }
 
-/* وضع ملء الشاشة الحقيقي بدون إعادة تدمير الصفحات */
+/* وضع ملء الشاشة الحقيقي بدون إخفاء الكتاب */
 .reader-container.is-pure-fullscreen {
     position: fixed !important;
     inset: 0 !important;
@@ -436,10 +342,9 @@ body {
     top: 14px;
     right: 14px;
     z-index: 10000;
-    background: rgba(11, 37, 69, 0.8);
-    backdrop-filter: blur(12px);
+    background: rgba(11, 37, 69, 0.85);
     color: var(--white);
-    border: 1.5px solid var(--brand-orange);
+    border: 1.5px solid var(--orange-main);
     padding: 8px 16px;
     border-radius: 30px;
     font-size: 0.82rem;
@@ -452,7 +357,7 @@ body {
 }
 
 .reader-header {
-    background: linear-gradient(90deg, var(--brand-blue-deep), var(--brand-blue));
+    background: linear-gradient(90deg, var(--blue-deep), var(--blue-main));
     color: var(--white);
     padding: 10px 18px;
     display: flex;
@@ -469,10 +374,10 @@ body {
 }
 
 .badge-live {
-    background: var(--brand-orange);
+    background: var(--orange-main);
     color: var(--white);
-    font-size: 0.76rem;
-    font-weight: 800;
+    font-size: 0.78rem;
+    font-weight: 700;
     padding: 4px 10px;
     border-radius: 12px;
 }
@@ -487,18 +392,19 @@ body {
 .tool-btn {
     background: rgba(255, 255, 255, 0.14);
     color: var(--white);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.35);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 0.82rem;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 .tool-btn:hover, .tool-btn.active-tool {
-    background: var(--brand-orange);
+    background: var(--orange-main);
     color: var(--white);
-    border-color: var(--brand-orange);
+    border-color: var(--orange-main);
     font-weight: 700;
 }
 
@@ -515,25 +421,25 @@ body {
 .reading-progress-track {
     width: 100%;
     height: 4px;
-    background: var(--brand-blue-deep);
+    background: var(--blue-deep);
 }
 
 .reading-progress-fill {
     height: 100%;
     width: 0%;
-    background: var(--brand-orange);
+    background: var(--orange-main);
     transition: width 0.3s ease;
 }
 
 .flipbook-stage {
     flex: 1;
-    background: #0f172a;
+    background: #111827;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     position: relative;
-    padding: 12px;
+    padding: 16px;
 }
 
 .book-wrapper {
@@ -542,25 +448,26 @@ body {
     justify-content: center;
     align-items: center;
     transition: transform 0.25s ease;
-    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.85);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
 }
 
-.realistic-book-spine {
+/* الفاصل الواقعي بين الصفحتين */
+.book-center-spine {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 30px;
+    width: 28px;
     pointer-events: none;
     z-index: 50;
     background: linear-gradient(
         90deg,
         rgba(0, 0, 0, 0) 0%,
         rgba(0, 0, 0, 0.1) 25%,
-        rgba(0, 0, 0, 0.3) 48%,
-        rgba(0, 0, 0, 0.45) 50%,
-        rgba(0, 0, 0, 0.3) 52%,
+        rgba(0, 0, 0, 0.28) 48%,
+        rgba(0, 0, 0, 0.42) 50%,
+        rgba(0, 0, 0, 0.28) 52%,
         rgba(0, 0, 0, 0.1) 75%,
         rgba(0, 0, 0, 0) 100%
     );
@@ -570,7 +477,7 @@ body {
     position: absolute;
     top: 0;
     right: 28px;
-    background: linear-gradient(180deg, var(--brand-orange-dark) 0%, var(--brand-orange) 100%);
+    background: linear-gradient(180deg, var(--orange-dark) 0%, var(--orange-main) 100%);
     color: var(--white);
     font-weight: 800;
     font-size: 0.78rem;
@@ -591,16 +498,15 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    transition: background-color 0.3s ease;
 }
 
-/* الوضع الليلي / الورق الدافئ يطبق على كامل الورقة البيضاء بالكامل */
+/* الوضع الليلي يطبق على كامل الورقة البيضاء بالكامل */
 .sepia-mode .page-sheet {
-    background-color: #1e242b !important;
+    background-color: #181c24 !important;
 }
 
 .sepia-mode .page-sheet canvas {
-    filter: invert(0.88) hue-rotate(180deg) contrast(0.95);
+    filter: invert(0.9) hue-rotate(180deg) contrast(0.95);
 }
 
 .page-sheet canvas {
@@ -610,18 +516,18 @@ body {
 }
 
 .reader-footer-bar {
-    background: var(--brand-blue-deep);
+    background: var(--blue-deep);
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 2px solid var(--brand-orange);
+    border-top: 2px solid var(--orange-main);
 }
 
 .nav-page-btn {
-    background: var(--brand-blue);
+    background: var(--blue-main);
     color: var(--white);
-    border: 1px solid var(--brand-orange);
+    border: 1px solid var(--orange-main);
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
@@ -639,21 +545,15 @@ body {
 }
 
 .progress-percent {
-    color: var(--brand-orange);
+    color: var(--orange-main);
     font-size: 0.85rem;
 }
 
 .official-footer {
+    background: var(--blue-deep);
+    color: #dbeafe;
     text-align: center;
-    padding: 16px 0;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-/* توافق كامل مع الهواتف والآيباد */
-@media (max-width: 650px) {
-    .school-brand h1 { font-size: 1.35rem; }
-    .dock-item { padding: 7px 12px; font-size: 0.7rem; }
-    .reader-header { padding: 8px 12px; }
-    .tool-btn { padding: 5px 8px; font-size: 0.75rem; }
+    padding: 18px 0;
+    font-size: 0.9rem;
+    border-top: 3px solid var(--orange-main);
 }
