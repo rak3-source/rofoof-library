@@ -5,9 +5,629 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rofoof | Al-Arabiya Private School Digital Library</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+    <style>
+        :root {
+            --blue-deep: #0b2545;
+            --blue-main: #134074;
+            --blue-soft: #eef4fc;
+            --orange-main: #f97316;
+            --orange-dark: #ea580c;
+            --bg-page: #f5f7fa;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-bottom: 105px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* الهيدر الرسمي بالأزرق والبرتقالي */
+        .official-header {
+            background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue-main) 100%);
+            color: var(--white);
+            padding: 20px 0;
+            border-bottom: 4px solid var(--orange-main);
+            box-shadow: 0 4px 20px rgba(11, 37, 69, 0.25);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .school-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-royal-frame {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--white);
+            padding: 5px;
+            border: 3px solid var(--orange-main);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .school-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .school-brand h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--white);
+        }
+
+        .school-brand p {
+            font-size: 0.9rem;
+            color: #fed7aa;
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .search-box input {
+            width: 300px;
+            max-width: 100%;
+            padding: 11px 18px;
+            border-radius: 30px;
+            border: 2px solid rgba(249, 115, 22, 0.65);
+            background: rgba(255, 255, 255, 0.14);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--white);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .search-box input::placeholder {
+            color: #dbeafe;
+        }
+
+        .search-box input:focus {
+            background: var(--white);
+            color: var(--text-dark);
+            border-color: var(--orange-main);
+        }
+
+        /* الشريط السفلي الزجاجي الثابت لا يتحرك */
+        .floating-glass-dock {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 900;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 50px;
+            background: rgba(11, 37, 69, 0.85);
+            backdrop-filter: blur(22px) saturate(180%);
+            -webkit-backdrop-filter: blur(22px) saturate(180%);
+            border: 1.5px solid var(--orange-main);
+            box-shadow: 0 12px 35px rgba(11, 37, 69, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+        }
+
+        .dock-item {
+            background: transparent;
+            border: 1.5px solid transparent;
+            color: rgba(255, 255, 255, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.76rem;
+            font-weight: 700;
+            transition: all 0.22s ease;
+            min-width: 76px;
+        }
+
+        .dock-item svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .dock-item:hover {
+            color: var(--white);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .dock-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fdba74;
+            border-color: var(--white);
+        }
+
+        /* قائمة الأقسام الزجاجية العائمة فوق الشريط السفلي */
+        .floating-categories-box {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 899;
+            width: 92%;
+            max-width: 470px;
+            padding: 18px 20px;
+            border-radius: 26px;
+            background: rgba(11, 37, 69, 0.94);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1.5px solid var(--orange-main);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+            transition: all 0.25s ease;
+        }
+
+        .floating-categories-box.open {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .popover-title {
+            color: #fdba74;
+            font-size: 0.82rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .popover-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .cat-chip {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            padding: 8px 16px;
+            border-radius: 22px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cat-chip.active, .cat-chip:hover {
+            background: var(--orange-main);
+            color: var(--white);
+            border-color: var(--orange-main);
+        }
+
+        /* القسم الرئيسي وبطاقات الكتب */
+        .main-section {
+            flex: 1;
+            padding: 36px 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #dbe4f0;
+        }
+
+        .section-header h2 {
+            color: var(--blue-deep);
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .book-count {
+            background: var(--blue-soft);
+            color: var(--blue-deep);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 1px solid var(--orange-main);
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+            gap: 28px;
+        }
+
+        .book-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #dbe4f0;
+            border-left: 8px solid var(--blue-main);
+            box-shadow: 0 10px 25px rgba(11, 37, 69, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 35px rgba(11, 37, 69, 0.16);
+            border-color: var(--orange-main);
+        }
+
+        .book-cover-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            background: var(--blue-deep);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+
+        .book-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(11, 37, 69, 0.92);
+            color: #fed7aa;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1px solid var(--orange-main);
+        }
+
+        .book-info {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .book-category {
+            color: var(--orange-dark);
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .book-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .book-author {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        .read-btn {
+            margin-top: auto;
+            width: 100%;
+            background: linear-gradient(135deg, var(--blue-deep), var(--blue-main));
+            color: var(--white);
+            border: 1px solid var(--orange-main);
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        /* قارئ الكتاب الفوري بملء الشاشة + الأدوات الجانبية */
+        .reader-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #0b1320;
+            z-index: 2000;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .reader-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            background: #0b1320;
+        }
+
+        .reading-progress-track {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 2200;
+        }
+
+        .reading-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--orange-main);
+            transition: width 0.3s ease;
+        }
+
+        .side-tools-toggle {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 2300;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(11, 37, 69, 0.88);
+            backdrop-filter: blur(14px);
+            color: var(--white);
+            border: 2px solid var(--orange-main);
+            font-size: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            transition: all 0.2s ease;
+        }
+
+        .side-tools-toggle:hover, .side-tools-toggle.active {
+            background: var(--orange-main);
+        }
+
+        .side-tools-drawer {
+            position: fixed;
+            top: 74px;
+            right: 18px;
+            z-index: 2250;
+            width: 240px;
+            padding: 16px;
+            border-radius: 20px;
+            background: rgba(11, 37, 69, 0.94);
+            backdrop-filter: blur(22px);
+            border: 1.5px solid var(--orange-main);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transform: translateX(120%);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .side-tools-drawer.open {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .drawer-book-title {
+            color: var(--white);
+            font-weight: 800;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 8px;
+        }
+
+        .drawer-page-stat {
+            color: #fdba74;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .drawer-btn {
+            width: 100%;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .drawer-btn:hover, .drawer-btn.active-tool {
+            background: var(--orange-main);
+            border-color: var(--orange-main);
+            font-weight: 700;
+        }
+
+        .drawer-zoom-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .drawer-zoom-row .drawer-btn {
+            text-align: center;
+        }
+
+        .drawer-close-btn {
+            background: #dc2626;
+            border-color: #dc2626;
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        .flipbook-stage {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 6px;
+        }
+
+        .book-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.25s ease;
+            box-shadow: 0 25px 65px rgba(0, 0, 0, 0.85);
+        }
+
+        /* فاصلة الكتاب الواقعية بالتظليل ثلاثي الأبعاد */
+        .realistic-gutter-shadow {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            pointer-events: none;
+            z-index: 50;
+            background: linear-gradient(
+                90deg,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.05) 18%,
+                rgba(0, 0, 0, 0.14) 34%,
+                rgba(255, 255, 255, 0.25) 43%,
+                rgba(0, 0, 0, 0.35) 48.5%,
+                rgba(0, 0, 0, 0.55) 50%,
+                rgba(0, 0, 0, 0.35) 51.5%,
+                rgba(255, 255, 255, 0.25) 57%,
+                rgba(0, 0, 0, 0.14) 66%,
+                rgba(0, 0, 0, 0.05) 82%,
+                rgba(0, 0, 0, 0) 100%
+            );
+        }
+
+        .orange-bookmark-ribbon {
+            position: fixed;
+            top: 0;
+            right: 80px;
+            background: linear-gradient(180deg, var(--orange-dark) 0%, var(--orange-main) 100%);
+            color: var(--white);
+            font-weight: 800;
+            font-size: 0.78rem;
+            padding: 10px 12px 16px;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+            z-index: 2150;
+        }
+
+        .loading-text {
+            color: #fed7aa;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .page-sheet {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* الوضع الدافئ المريح للعين (Warm Mode) */
+        .warm-mode .page-sheet {
+            background-color: #f4ecd8 !important;
+        }
+
+        .warm-mode .page-sheet canvas {
+            filter: sepia(0.35) brightness(0.95) contrast(0.98);
+            mix-blend-mode: multiply;
+        }
+
+        .page-sheet canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .edge-nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2100;
+            width: 42px;
+            height: 64px;
+            background: rgba(11, 37, 69, 0.45);
+            backdrop-filter: blur(8px);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 2rem;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .edge-nav-btn:hover {
+            background: var(--orange-main);
+        }
+
+        .edge-prev { left: 10px; }
+        .edge-next { right: 10px; }
+
+        .official-footer {
+            background: var(--blue-deep);
+            color: #dbeafe;
+            text-align: center;
+            padding: 18px 0;
+            font-size: 0.9rem;
+            border-top: 3px solid var(--orange-main);
+        }
+    </style>
 </head>
 <body>
 
@@ -36,7 +656,7 @@
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- قائمة الأقسام الزجاجية العائمة فوق الشريط السفلي (الصورة 1) -->
+    <!-- قائمة الأقسام الزجاجية العائمة -->
     <div class="floating-categories-box" id="categoriesPopover">
         <div class="popover-title">BROWSE CATEGORIES</div>
         <div class="popover-grid">
@@ -50,7 +670,7 @@
         </div>
     </div>
 
-    <!-- الشريط السفلي الزجاجي الثابت (الصورة 1 بالأزرق والبرتقالي) -->
+    <!-- الشريط السفلي الزجاجي الثابت -->
     <nav class="floating-glass-dock" aria-label="Main Navigation">
         <button class="dock-item active" id="dockHomeBtn">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
@@ -70,39 +690,29 @@
         </button>
     </nav>
 
-    <!-- قارئ الكتاب بملء الشاشة الفوري مع لوحة أدوات جانبية قابلة للفتح والإغلاق -->
+    <!-- قارئ الكتاب الفوري -->
     <div class="reader-modal" id="readerModal">
         <div class="reader-container" id="readerContainer">
-            
-            <!-- شريط التقدم الرفيع في أعلى الشاشة -->
             <div class="reading-progress-track">
                 <div class="reading-progress-fill" id="readingProgressFill"></div>
             </div>
 
-            <!-- زر فتح/إغلاق الأدوات بجانب الصفحة اليمنى -->
-            <button class="side-tools-toggle" id="sideToolsToggle" title="Reading Tools">
-                ☰
-            </button>
+            <button class="side-tools-toggle" id="sideToolsToggle" title="Reading Tools">☰</button>
 
-            <!-- قائمة الأدوات الجانبية القابلة للفتح والإغلاق -->
             <aside class="side-tools-drawer" id="sideToolsDrawer">
                 <div class="drawer-book-title" id="modalBookTitle">A Bird in the Hand</div>
                 <div class="drawer-page-stat" id="pageIndicator">Page 1 of 1 (0%)</div>
-                
                 <button class="drawer-btn" id="bookmarkBtn">🔖 <span id="bookmarkText">Save Bookmark</span></button>
                 <button class="drawer-btn" id="goBookmarkBtn" style="display: none;">📌 Go to Saved (<span id="savedPageNum">1</span>)</button>
                 <button class="drawer-btn" id="warmModeBtn">☀️ Warm Mode</button>
-                
                 <div class="drawer-zoom-row">
                     <button class="drawer-btn" id="zoomOutBtn">➖ Zoom</button>
                     <button class="drawer-btn" id="zoomInBtn">➕ Zoom</button>
                 </div>
-
                 <button class="drawer-btn" id="fullscreenBtn">⛶ Full Screen</button>
                 <button class="drawer-btn drawer-close-btn" id="closeModalBtn">✕ Close Book</button>
             </aside>
 
-            <!-- منصة الكتاب: تملأ الشاشة فوراً وتلقائياً -->
             <div class="flipbook-stage" id="flipbookStage">
                 <div id="loadingSpinner" class="loading-text">Opening Book Pages...</div>
 
@@ -112,15 +722,12 @@
 
                 <div class="book-wrapper" id="bookWrapper">
                     <div id="flipbookContainer"></div>
-                    <!-- الفاصلة الواقعية بالتظليل ثلاثي الأبعاد -->
                     <div class="realistic-gutter-shadow" id="goldenSpine"></div>
                 </div>
 
-                <!-- أسهم تقليب سريعة وشفافة على الأطراف -->
                 <button class="edge-nav-btn edge-prev" id="prevPageBtn" title="Previous Page">‹</button>
                 <button class="edge-nav-btn edge-next" id="nextPageBtn" title="Next Page">›</button>
             </div>
-
         </div>
     </div>
 
@@ -130,6 +737,368 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const booksData = [
+            {
+                id: 1,
+                title: "A Bird in the Hand",
+                author: "Randall Garrett",
+                category: "Science Fiction",
+                cover: "cover1.jpg",
+                pdfUrl: "books/sample1.pdf"
+            }
+        ];
+
+        const booksGrid = document.getElementById('booksGrid');
+        const searchInput = document.getElementById('searchInput');
+        const sectionTitle = document.getElementById('sectionTitle');
+        const bookCount = document.getElementById('bookCount');
+        const readerModal = document.getElementById('readerModal');
+        const readerContainer = document.getElementById('readerContainer');
+        const modalBookTitle = document.getElementById('modalBookTitle');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const flipbookContainer = document.getElementById('flipbookContainer');
+        const bookWrapper = document.getElementById('bookWrapper');
+        const goldenSpine = document.getElementById('goldenSpine');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const pageIndicator = document.getElementById('pageIndicator');
+        const readingProgressFill = document.getElementById('readingProgressFill');
+
+        const dockHomeBtn = document.getElementById('dockHomeBtn');
+        const dockCategoriesBtn = document.getElementById('dockCategoriesBtn');
+        const dockSavedBtn = document.getElementById('dockSavedBtn');
+        const dockSearchBtn = document.getElementById('dockSearchBtn');
+        const categoriesPopover = document.getElementById('categoriesPopover');
+        const catChips = document.querySelectorAll('.cat-chip');
+
+        const sideToolsToggle = document.getElementById('sideToolsToggle');
+        const sideToolsDrawer = document.getElementById('sideToolsDrawer');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const bookmarkBtn = document.getElementById('bookmarkBtn');
+        const bookmarkText = document.getElementById('bookmarkText');
+        const goBookmarkBtn = document.getElementById('goBookmarkBtn');
+        const savedPageNum = document.getElementById('savedPageNum');
+        const goldBookmarkRibbon = document.getElementById('goldBookmarkRibbon');
+        const warmModeBtn = document.getElementById('warmModeBtn');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+        let currentCategory = 'all';
+        let onlySavedFilter = false;
+        let pageFlipInstance = null;
+        let currentBookId = null;
+        let currentPageIndex = 0;
+        let totalBookPages = 1;
+        let currentZoom = 1;
+
+        function renderBooks(books) {
+            booksGrid.innerHTML = '';
+            bookCount.textContent = `${books.length} ${books.length === 1 ? 'Book' : 'Books'} Available`;
+
+            if (books.length === 0) {
+                booksGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #475569; padding: 40px;">No books found in this section yet.</p>';
+                return;
+            }
+
+            books.forEach(book => {
+                const savedPage = localStorage.getItem(`rofoof_bookmark_${book.id}`);
+                const badgeLabel = savedPage !== null ? `🔖 Page ${parseInt(savedPage) + 1}` : '📖 Flipbook Ready';
+
+                const card = document.createElement('div');
+                card.className = 'book-card';
+                card.onclick = () => openBook(book);
+
+                card.innerHTML = `
+                    <div class="book-cover-wrapper">
+                        <img src="${book.cover}" alt="${book.title}" class="book-cover">
+                        <span class="book-badge">${badgeLabel}</span>
+                    </div>
+                    <div class="book-info">
+                        <span class="book-category">${book.category}</span>
+                        <h3 class="book-title">${book.title}</h3>
+                        <p class="book-author">By: ${book.author}</p>
+                        <button class="read-btn">${savedPage !== null ? 'Continue Reading' : 'Open Book'}</button>
+                    </div>
+                `;
+                booksGrid.appendChild(card);
+            });
+        }
+
+        function filterBooks() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filtered = booksData.filter(book => {
+                const matchesCategory = currentCategory === 'all' || book.category === currentCategory;
+                const matchesSearch = book.title.toLowerCase().includes(searchTerm) || book.author.toLowerCase().includes(searchTerm);
+                const matchesSaved = !onlySavedFilter || localStorage.getItem(`rofoof_bookmark_${book.id}`) !== null;
+                return matchesCategory && matchesSearch && matchesSaved;
+            });
+            renderBooks(filtered);
+        }
+
+        function setActiveDock(btn) {
+            [dockHomeBtn, dockCategoriesBtn, dockSavedBtn, dockSearchBtn].forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        dockHomeBtn.addEventListener('click', () => {
+            setActiveDock(dockHomeBtn);
+            categoriesPopover.classList.remove('open');
+            currentCategory = 'all';
+            onlySavedFilter = false;
+            sectionTitle.textContent = 'Featured Library Collection';
+            filterBooks();
+        });
+
+        dockCategoriesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setActiveDock(dockCategoriesBtn);
+            categoriesPopover.classList.toggle('open');
+        });
+
+        dockSavedBtn.addEventListener('click', () => {
+            setActiveDock(dockSavedBtn);
+            categoriesPopover.classList.remove('open');
+            onlySavedFilter = true;
+            sectionTitle.textContent = 'Bookmarked Books';
+            filterBooks();
+        });
+
+        dockSearchBtn.addEventListener('click', () => {
+            setActiveDock(dockSearchBtn);
+            categoriesPopover.classList.remove('open');
+            searchInput.focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        catChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                catChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentCategory = chip.dataset.category;
+                onlySavedFilter = false;
+                sectionTitle.textContent = currentCategory === 'all' ? 'Featured Library Collection' : `${currentCategory} Section`;
+                categoriesPopover.classList.remove('open');
+                filterBooks();
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!categoriesPopover.contains(e.target) && !dockCategoriesBtn.contains(e.target)) {
+                categoriesPopover.classList.remove('open');
+            }
+        });
+
+        searchInput.addEventListener('input', filterBooks);
+
+        sideToolsToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sideToolsDrawer.classList.toggle('open');
+            sideToolsToggle.classList.toggle('active');
+            sideToolsToggle.textContent = sideToolsDrawer.classList.contains('open') ? '✕' : '☰';
+        });
+
+        function isCurrentPageBookmarked() {
+            const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
+            if (saved === null) return false;
+            const savedIdx = parseInt(saved);
+            return savedIdx === currentPageIndex || savedIdx === currentPageIndex + 1;
+        }
+
+        function updateReadingUI(pageIdx) {
+            currentPageIndex = pageIdx;
+            const displayPage = pageIdx + 1;
+            const percent = Math.round((displayPage / totalBookPages) * 100);
+
+            pageIndicator.textContent = `Page ${displayPage} of ${totalBookPages} (${percent}%)`;
+            readingProgressFill.style.width = `${percent}%`;
+
+            const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
+            if (saved !== null) {
+                const savedIdx = parseInt(saved);
+                savedPageNum.textContent = savedIdx + 1;
+                goBookmarkBtn.style.display = 'block';
+
+                if (isCurrentPageBookmarked()) {
+                    goldBookmarkRibbon.style.display = 'block';
+                    bookmarkText.textContent = 'Remove Bookmark';
+                    bookmarkBtn.classList.add('active-tool');
+                } else {
+                    goldBookmarkRibbon.style.display = 'none';
+                    bookmarkText.textContent = 'Save Bookmark';
+                    bookmarkBtn.classList.remove('active-tool');
+                }
+            } else {
+                goBookmarkBtn.style.display = 'none';
+                goldBookmarkRibbon.style.display = 'none';
+                bookmarkText.textContent = 'Save Bookmark';
+                bookmarkBtn.classList.remove('active-tool');
+            }
+        }
+
+        async function openBook(book) {
+            currentBookId = book.id;
+            currentZoom = 1;
+            bookWrapper.style.transform = 'scale(1)';
+            sideToolsDrawer.classList.remove('open');
+            sideToolsToggle.classList.remove('active');
+            sideToolsToggle.textContent = '☰';
+
+            modalBookTitle.textContent = book.title;
+            readerModal.style.display = 'block';
+            loadingSpinner.style.display = 'block';
+            goldenSpine.style.display = 'none';
+
+            if (pageFlipInstance) {
+                pageFlipInstance.destroy();
+                pageFlipInstance = null;
+            }
+            flipbookContainer.innerHTML = '';
+
+            try {
+                const pdf = await pdfjsLib.getDocument(book.pdfUrl).promise;
+                totalBookPages = pdf.numPages;
+
+                for (let pageNum = 1; pageNum <= totalBookPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const viewport = page.getViewport({ scale: 1.6 });
+
+                    const pageDiv = document.createElement('div');
+                    pageDiv.className = 'page-sheet';
+
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({ canvasContext: context, viewport: viewport }).promise;
+                    pageDiv.appendChild(canvas);
+                    flipbookContainer.appendChild(pageDiv);
+                }
+
+                loadingSpinner.style.display = 'none';
+
+                const isMobile = window.innerWidth < 650;
+                goldenSpine.style.display = isMobile ? 'none' : 'block';
+
+                const availW = window.innerWidth - 16;
+                const availH = window.innerHeight - 16;
+
+                pageFlipInstance = new St.PageFlip(flipbookContainer, {
+                    width: isMobile ? availW : Math.floor(availW / 2),
+                    height: availH,
+                    size: "stretch",
+                    minWidth: 260,
+                    maxWidth: 1400,
+                    minHeight: 360,
+                    maxHeight: 1600,
+                    showCover: false,
+                    usePortrait: isMobile,
+                    mobileScrollSupport: false
+                });
+
+                pageFlipInstance.loadFromHTML(document.querySelectorAll('.page-sheet'));
+
+                const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
+                const startPage = saved !== null ? parseInt(saved) : 0;
+
+                if (startPage > 0 && startPage < totalBookPages) {
+                    setTimeout(() => {
+                        if (pageFlipInstance) pageFlipInstance.turnToPage(startPage);
+                    }, 150);
+                }
+
+                updateReadingUI(startPage);
+
+                pageFlipInstance.on('flip', (e) => {
+                    updateReadingUI(e.data);
+                });
+
+            } catch (error) {
+                loadingSpinner.textContent = 'Error loading PDF file.';
+                console.error(error);
+            }
+        }
+
+        bookmarkBtn.addEventListener('click', () => {
+            if (!currentBookId) return;
+            if (isCurrentPageBookmarked()) {
+                localStorage.removeItem(`rofoof_bookmark_${currentBookId}`);
+            } else {
+                localStorage.setItem(`rofoof_bookmark_${currentBookId}`, currentPageIndex);
+            }
+            updateReadingUI(currentPageIndex);
+            filterBooks();
+        });
+
+        goBookmarkBtn.addEventListener('click', () => {
+            const saved = localStorage.getItem(`rofoof_bookmark_${currentBookId}`);
+            if (saved !== null && pageFlipInstance) {
+                pageFlipInstance.flip(parseInt(saved));
+            }
+        });
+
+        warmModeBtn.addEventListener('click', () => {
+            bookWrapper.classList.toggle('warm-mode');
+            warmModeBtn.classList.toggle('active-tool');
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (readerContainer.requestFullscreen) {
+                    readerContainer.requestFullscreen().catch(() => {});
+                } else if (readerContainer.webkitRequestFullscreen) {
+                    readerContainer.webkitRequestFullscreen();
+                }
+                fullscreenBtn.textContent = '⛶ Exit Full Screen';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(() => {});
+                }
+                fullscreenBtn.textContent = '⛶ Full Screen';
+            }
+        });
+
+        zoomInBtn.addEventListener('click', () => {
+            if (currentZoom < 1.5) {
+                currentZoom += 0.15;
+                bookWrapper.style.transform = `scale(${currentZoom})`;
+            }
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            if (currentZoom > 0.85) {
+                currentZoom -= 0.15;
+                bookWrapper.style.transform = `scale(${currentZoom})`;
+            }
+        });
+
+        prevPageBtn.addEventListener('click', () => {
+            if (pageFlipInstance) pageFlipInstance.flipPrev();
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            if (pageFlipInstance) pageFlipInstance.flipNext();
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            }
+            readerModal.style.display = 'none';
+            if (pageFlipInstance) {
+                pageFlipInstance.destroy();
+                pageFlipInstance = null;
+            }
+            flipbookContainer.innerHTML = '';
+            filterBooks();
+        });
+
+        // رسم الكتب فوراً
+        renderBooks(booksData);
+    </script>
 </body>
 </html>
