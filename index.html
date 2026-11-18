@@ -43,7 +43,6 @@
             padding: 0 20px;
         }
 
-        /* الهيدر الرسمي بالأزرق والبرتقالي */
         .official-header {
             background: linear-gradient(135deg, var(--blue-deep) 0%, var(--blue-main) 100%);
             color: var(--white);
@@ -125,7 +124,6 @@
             border-color: var(--orange-main);
         }
 
-        /* الشريط السفلي الزجاجي الثابت لا يتحرك */
         .floating-glass-dock {
             position: fixed;
             bottom: 20px;
@@ -178,7 +176,6 @@
             border-color: var(--white);
         }
 
-        /* قائمة الأقسام الزجاجية العائمة فوق الشريط السفلي */
         .floating-categories-box {
             position: fixed;
             bottom: 100px;
@@ -240,7 +237,6 @@
             border-color: var(--orange-main);
         }
 
-        /* القسم الرئيسي وبطاقات الكتب */
         .main-section {
             flex: 1;
             padding: 36px 20px;
@@ -367,9 +363,7 @@
             cursor: pointer;
         }
 
-        /* ========================================================
-           قارئ الكتاب الكبير والواضح فوراً + الأدوات الجانبية
-           ======================================================== */
+        /* قارئ الكتاب الفوري */
         .reader-modal {
             display: none;
             position: fixed;
@@ -387,7 +381,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            overflow: auto;
+            overflow: hidden;
             background: #0b1320;
         }
 
@@ -517,7 +511,6 @@
             position: relative;
         }
 
-        /* حاوية الكتاب بأبعاد صريحة تملأ الشاشة بالكامل */
         .book-wrapper {
             position: relative;
             display: flex;
@@ -533,7 +526,6 @@
             background: #f4ecd8 !important;
         }
 
-        /* فاصلة الكتاب الواقعية بالتظليل ثلاثي الأبعاد */
         .realistic-gutter-shadow {
             position: absolute;
             top: 0;
@@ -665,7 +657,6 @@
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- قائمة الأقسام الزجاجية العائمة -->
     <div class="floating-categories-box" id="categoriesPopover">
         <div class="popover-title">BROWSE CATEGORIES</div>
         <div class="popover-grid">
@@ -679,7 +670,6 @@
         </div>
     </div>
 
-    <!-- الشريط السفلي الزجاجي الثابت -->
     <nav class="floating-glass-dock" aria-label="Main Navigation">
         <button class="dock-item active" id="dockHomeBtn">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
@@ -699,7 +689,6 @@
         </button>
     </nav>
 
-    <!-- قارئ الكتاب الفوري الكبير والواضح -->
     <div class="reader-modal" id="readerModal">
         <div class="reader-container" id="readerContainer">
             <div class="reading-progress-track">
@@ -765,7 +754,6 @@
         const sectionTitle = document.getElementById('sectionTitle');
         const bookCount = document.getElementById('bookCount');
         const readerModal = document.getElementById('readerModal');
-        const readerContainer = document.getElementById('readerContainer');
         const modalBookTitle = document.getElementById('modalBookTitle');
         const closeModalBtn = document.getElementById('closeModalBtn');
         const flipbookContainer = document.getElementById('flipbookContainer');
@@ -803,6 +791,9 @@
         let currentPageIndex = 0;
         let totalBookPages = 1;
         let currentZoom = 1;
+        let activePageRatio = 0.72;
+        let baseBookW = 800;
+        let baseBookH = 600;
 
         function renderBooks(books) {
             booksGrid.innerHTML = '';
@@ -948,10 +939,26 @@
             }
         }
 
+        // دالة ضبط أبعاد الكتاب تلقائياً عند تغيير حجم الشاشة أو الدخول والخروج من وضع ملء الشاشة
+        function fitBookToViewport() {
+            if (readerModal.style.display !== 'block' || !baseBookW || !baseBookH) return;
+            const availW = window.innerWidth - 12;
+            const availH = window.innerHeight - 12;
+            const fitScale = Math.min(availW / baseBookW, availH / baseBookH);
+            bookWrapper.style.transform = `scale(${fitScale * currentZoom})`;
+        }
+
+        window.addEventListener('resize', fitBookToViewport);
+        document.addEventListener('fullscreenchange', () => {
+            const isFs = !!document.fullscreenElement;
+            fullscreenBtn.textContent = isFs ? '⛶ Exit Full Screen' : '⛶ Full Screen';
+            fullscreenBtn.classList.toggle('active-tool', isFs);
+            setTimeout(fitBookToViewport, 80);
+        });
+
         async function openBook(book) {
             currentBookId = book.id;
             currentZoom = 1;
-            bookWrapper.style.transform = 'scale(1)';
             bookWrapper.style.display = 'none';
             sideToolsDrawer.classList.remove('open');
             sideToolsToggle.classList.remove('active');
@@ -972,36 +979,36 @@
                 const pdf = await pdfjsLib.getDocument(book.pdfUrl).promise;
                 totalBookPages = pdf.numPages;
 
-                // حساب النسبة الحقيقية لصفحة الـ PDF لمنع أي مساحات سوداء فوق أو تحت الكتاب
                 const firstPage = await pdf.getPage(1);
                 const baseViewport = firstPage.getViewport({ scale: 1 });
-                const pageRatio = baseViewport.width / baseViewport.height;
+                activePageRatio = baseViewport.width / baseViewport.height;
 
                 const isMobile = window.innerWidth < 650;
-                const maxScreenH = window.innerHeight - 16;
-                const maxScreenW = window.innerWidth - 20;
+                const maxScreenH = window.innerHeight - 12;
+                const maxScreenW = window.innerWidth - 12;
 
                 let singlePageH = maxScreenH;
-                let singlePageW = Math.floor(singlePageH * pageRatio);
+                let singlePageW = Math.floor(singlePageH * activePageRatio);
 
                 if (isMobile) {
                     if (singlePageW > maxScreenW) {
                         singlePageW = maxScreenW;
-                        singlePageH = Math.floor(singlePageW / pageRatio);
+                        singlePageH = Math.floor(singlePageW / activePageRatio);
                     }
                 } else {
                     if (singlePageW * 2 > maxScreenW) {
                         singlePageW = Math.floor(maxScreenW / 2);
-                        singlePageH = Math.floor(singlePageW / pageRatio);
+                        singlePageH = Math.floor(singlePageW / activePageRatio);
                     }
                 }
 
-                // ضبط أبعاد حاوية الكتاب بالبكسل الدقيق لتملأ الشاشة بالكامل وتكون واضحة جداً للقراءة
-                const totalBookW = isMobile ? singlePageW : singlePageW * 2;
-                bookWrapper.style.width = `${totalBookW}px`;
-                bookWrapper.style.height = `${singlePageH}px`;
-                flipbookContainer.style.width = `${totalBookW}px`;
-                flipbookContainer.style.height = `${singlePageH}px`;
+                baseBookW = isMobile ? singlePageW : singlePageW * 2;
+                baseBookH = singlePageH;
+
+                bookWrapper.style.width = `${baseBookW}px`;
+                bookWrapper.style.height = `${baseBookH}px`;
+                flipbookContainer.style.width = `${baseBookW}px`;
+                flipbookContainer.style.height = `${baseBookH}px`;
 
                 for (let pageNum = 1; pageNum <= totalBookPages; pageNum++) {
                     const page = await pdf.getPage(pageNum);
@@ -1023,6 +1030,7 @@
                 loadingSpinner.style.display = 'none';
                 bookWrapper.style.display = 'flex';
                 goldenSpine.style.display = isMobile ? 'none' : 'block';
+                fitBookToViewport();
 
                 pageFlipInstance = new St.PageFlip(flipbookContainer, {
                     width: singlePageW,
@@ -1079,7 +1087,6 @@
             warmModeBtn.classList.toggle('active-tool');
         });
 
-        // زر ملء الشاشة يعمل على عنصر documentElement الآمن دون إخفاء الكتاب أبداً
         fullscreenBtn.addEventListener('click', () => {
             if (!document.fullscreenElement) {
                 const docEl = document.documentElement;
@@ -1088,28 +1095,24 @@
                 } else if (docEl.webkitRequestFullscreen) {
                     docEl.webkitRequestFullscreen();
                 }
-                fullscreenBtn.textContent = '⛶ Exit Full Screen';
-                fullscreenBtn.classList.add('active-tool');
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen().catch(() => {});
                 }
-                fullscreenBtn.textContent = '⛶ Full Screen';
-                fullscreenBtn.classList.remove('active-tool');
             }
         });
 
         zoomInBtn.addEventListener('click', () => {
             if (currentZoom < 1.6) {
                 currentZoom += 0.15;
-                bookWrapper.style.transform = `scale(${currentZoom})`;
+                fitBookToViewport();
             }
         });
 
         zoomOutBtn.addEventListener('click', () => {
             if (currentZoom > 0.75) {
                 currentZoom -= 0.15;
-                bookWrapper.style.transform = `scale(${currentZoom})`;
+                fitBookToViewport();
             }
         });
 
