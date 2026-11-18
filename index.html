@@ -22,17 +22,19 @@
                     <p>Al-Arabiya Private School — Official Reading Portal</p>
                 </div>
             </div>
-            <div class="search-box" id="headerSearchBox">
+            <div class="glass-search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 <input type="text" id="searchInput" placeholder="Search books by title or author...">
             </div>
         </div>
     </header>
 
-    <!-- قائمة الأقسام المنبثقة فوق الشريط السفلي -->
-    <div class="categories-popover" id="categoriesPopover">
-        <div class="popover-title">Browse Categories</div>
+    <!-- قائمة الأقسام الزجاجية الثابتة فوق الشريط السفلي -->
+    <div class="glass-categories-popover" id="categoriesPopover">
+        <div class="popover-title">Book Categories</div>
         <div class="popover-grid">
             <button class="cat-chip active" data-category="all">All Books</button>
+            <button class="cat-chip" data-category="School Book">School Book</button>
             <button class="cat-chip" data-category="Science Fiction">Science Fiction</button>
             <button class="cat-chip" data-category="Short Stories">Short Stories</button>
             <button class="cat-chip" data-category="Novels">Novels</button>
@@ -49,8 +51,8 @@
         <div class="books-grid" id="booksGrid"></div>
     </main>
 
-    <!-- الشريط السفلي الزجاجي العائم (Floating Glass Dock) -->
-    <nav class="floating-glass-dock" aria-label="Main Navigation">
+    <!-- شريط Apple Books الزجاجي الثابت في الأسفل (لا يتحرك مع التمرير) -->
+    <nav class="apple-glass-dock" aria-label="Main Navigation">
         <button class="dock-item active" id="dockHomeBtn">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>
             <span>Home</span>
@@ -69,11 +71,11 @@
         </button>
     </nav>
 
-    <!-- نافذة القارئ الاحترافي -->
+    <!-- نافذة قارئ الكتاب الاحترافي -->
     <div class="reader-modal" id="readerModal">
         <div class="reader-container" id="readerContainer">
-            <!-- زر الخروج العائم يظهر فقط في وضع ملء الشاشة الكامل -->
-            <button class="floating-exit-fs" id="exitFullscreenFloatBtn" title="Exit Full Screen">✕ Exit Full Screen</button>
+            <!-- زر الخروج من ملء الشاشة -->
+            <button class="floating-exit-fs" id="exitFullscreenFloatBtn">✕ Exit Full Screen</button>
 
             <div class="reader-header" id="readerHeader">
                 <div class="reader-title-group">
@@ -84,7 +86,7 @@
                 <div class="reader-toolbar">
                     <button class="tool-btn" id="bookmarkBtn">🔖 <span id="bookmarkText">Save Bookmark</span></button>
                     <button class="tool-btn" id="goBookmarkBtn" style="display: none;">📌 Page <span id="savedPageNum">1</span></button>
-                    <button class="tool-btn" id="sepiaBtn">🌙 Warm Paper</button>
+                    <button class="tool-btn" id="sepiaBtn">🌙 Night / Warm</button>
                     <button class="tool-btn" id="zoomOutBtn">➖</button>
                     <button class="tool-btn" id="zoomInBtn">➕</button>
                     <button class="tool-btn" id="fullscreenBtn">⛶ Full Screen</button>
@@ -92,20 +94,19 @@
                 </div>
             </div>
 
-            <div class="reading-progress-track" id="progressTrack">
+            <div class="reading-progress-track">
                 <div class="reading-progress-fill" id="readingProgressFill"></div>
             </div>
 
             <div class="reader-body flipbook-stage" id="flipbookStage">
                 <div id="loadingSpinner" class="loading-text">Opening Book Pages...</div>
 
-                <div class="gold-bookmark-ribbon" id="goldBookmarkRibbon" style="display: none;">
+                <div class="orange-bookmark-ribbon" id="goldBookmarkRibbon" style="display: none;">
                     <span>🔖 Saved</span>
                 </div>
 
                 <div class="book-wrapper" id="bookWrapper">
                     <div id="flipbookContainer"></div>
-                    <!-- فاصلة الكتاب الواقعية الفاخرة (تستخدم spine.png تلقائياً إن وُجدت) -->
                     <div class="realistic-book-spine" id="goldenSpine"></div>
                 </div>
             </div>
